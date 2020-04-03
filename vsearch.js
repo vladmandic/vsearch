@@ -49,7 +49,6 @@ var lucene = require("node-lucene");
 var getopts = require("getopts");
 var conf = require("conf");
 var fileType = require('file-type');
-var request = require('sync-request');
 // globals
 var appVersion = '0.0.3';
 var logger;
@@ -63,6 +62,7 @@ var numDocsStart = 0;
 var searchDir = [];
 var excludeDir = [];
 var timeStamp = 0;
+var tikaRunning = false;
 var config = new conf({
     cwd: '.',
     projectName: 'vsearch',
@@ -134,28 +134,51 @@ function has(what, substring) {
 function checkTikaServer(jar) {
     // const cmd = `java -Duser.home=/tmp -jar ${jar}`;
     logger.verbose('tikaServerJava: ' + jar);
-    var url = 'http://localhost:9998';
     try {
-        var res = request('GET', url, {
-            timeout: 2000,
-            retry: false
-        });
-        var body = res.body.toString('utf-8');
-        var startLoc = body.indexOf('Apache Tika');
-        var endLoc = body.indexOf('</title>');
-        if (startLoc != -1) {
-            var ver = body.substring(startLoc, endLoc);
-            logger.verbose('tikaServer: ' + ver);
-            return true;
-        }
-        else {
-            logger.warn('tikaServer: not running');
-            return false;
-        }
+        /*
+            const url = 'http://localhost:9998';
+            var res = request('GET', url, {
+              timeout: 2000,
+              retry: false,
+            });
+            const body:string = res.body.toString('utf-8');
+            const startLoc = body.indexOf('Apache Tika');
+            const endLoc = body.indexOf('</title>');
+            if (startLoc != -1) {
+              const ver = body.substring(startLoc, endLoc);
+              logger.verbose('tikaServer: ' + ver);
+              tikaRunning = true;
+            } else {
+              logger.warn('tikaServer: not running');
+            }
+        */
     }
     catch (err) {
         logger.warn('tikaServer: ' + err.message);
-        return false;
+    }
+}
+function addDataTika(file, stats) {
+    if (!tikaRunning) {
+        logger.debug('addData: tika server is not available');
+        return '[no data]';
+    }
+    var data = '';
+    try {
+        /*
+            var buf = readFileHeader(file, stats, 1024*1024);
+            const url = 'http://localhost:9998';
+            var res = request('POST', url, {
+              headers: {Accept: 'text/plain'},
+              timeout: 2000,
+              retry: false,
+            });
+            const body:string = res.body.toString('utf-8');
+        */
+        return data;
+    }
+    catch (err) {
+        logger.warn('addData: tika ' + err.message);
+        return '[no data]';
     }
 }
 // general lucene database init calls, used later by both reader and writer
@@ -274,8 +297,7 @@ function luceneInfo() {
 function luceneWriteInit() {
     logger.info('luceneWrite');
     var writerConfig = new lucene.index.IndexWriterConfig(analyzer);
-    logger.debug('writerConfig:');
-    logger.debug(JSON.stringify(writerConfig.toString()));
+    logger.debug('writerConfig:' + JSON.stringify(writerConfig.toString()));
     try {
         if (args.format) {
             logger.info('luceneFormatDB');
@@ -308,11 +330,11 @@ function addData(file, stats, mime) {
             data = '[directory]';
         }
         if (has(mime, 'text')) {
-            logger.debug("addDataText: " + file + ": " + mime);
+            logger.debug("addData: text " + file + ": " + mime);
             data = readFileHeader(file, stats, 65536).toString(); // for text files, read first 64k
         }
         if (has(mime, 'image')) {
-            logger.debug("addDataMime: " + file + ": " + mime);
+            logger.debug("addData: exif " + file + ": " + mime);
             var buf = readFileHeader(file, stats, 2048); // for exif data, read first 2k
             var meta = exif.fromBuffer(buf);
             data = JSON.stringify(meta);
@@ -321,7 +343,8 @@ function addData(file, stats, mime) {
             }
         }
         if (has(mime, 'application/pdf')) {
-            logger.debug("addDataTika: " + file + ": " + mime);
+            data = addDataTika(file, stats);
+            return data;
         }
     }
     catch (err) {
@@ -332,21 +355,16 @@ function addData(file, stats, mime) {
 }
 function detectMime(file, stats) {
     try {
-        logger.debug('detectMime1: ' + file);
         var buf = readFileHeader(file, stats, 4096); // for magic data data, read first 1k
         var obj = fileType(buf);
-        logger.debug('detectMime2: ' + file);
         if (obj !== undefined) {
-            logger.debug('detectMime3: ' + file);
             return obj.mime;
         }
         else {
-            logger.debug('detectMime4: ' + file);
             return 'unknown';
         }
     }
     catch (err) {
-        logger.debug('detectMime5: ' + file);
         return 'unknown';
     }
 }
