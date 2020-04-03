@@ -1,0 +1,56 @@
+{
+  "private": true,
+  "name": "vsearch",
+  "version": "0.0.3",
+  "description": "filesystem search implemented in nodejs/typescript and lucene/java",
+  "keywords": [
+    "search",
+    "lucene"
+  ],
+  "author": "Vladimir Mandic",
+  "license": "ISC",
+  "main": "vsearch.js",
+  "bin": "bin",
+  "scripts": {
+    "build": "tsc vsearch.ts",
+    "start": "node --max-old-space-size=1024 vsearch.js",
+    "help": "node vsearch.js -help",
+    "test": "ts-node vsearch.ts",
+    "lint": "eslint -c eslint.json vsearch.ts"
+  },
+  "dependencies": {
+    "@conscia/tika": "^1.14.1",
+    "@types/node": "^12.7.12",
+    "child_process": "^1.0.2",
+    "conf": "^6.1.0",
+    "fibers": "^4.0.1",
+    "file-type": "^12.3.0",
+    "fs": "0.0.1-security",
+    "getopts": "^2.2.5",
+    "java": "^0.11.1",
+    "jpeg-exif": "^1.1.4",
+    "math": "0.0.3",
+    "node-java-rt": "0.0.5",
+    "node-lucene": "0.0.7",
+    "path": "^0.12.7",
+    "synchronize": "^2.0.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/java": "^0.9.0",
+    "@types/mmmagic": "^0.4.29",
+    "@types/winston": "^2.4.4",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "eslint": "^6.5.1",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
+  }
+}

@@ -1,0 +1,46 @@
+{
+        "logFile": "vsearch.log",
+        "luceneClassDir": "lucene-lib",
+        "luceneDBDir": "db",
+        "$searchDir": [
+            "/opt/vsearch"
+        ],
+        "searchDir": [
+            "test-data"
+        ],
+        "#searchDir": [
+            "/bin",
+            "/boot",
+            "/dev",
+            "/etc",
+            "/home",
+            "lib",
+            "/opt",
+            "/proc",
+            "/run",
+            "/sbin",
+            "/sys",
+            "/tmp",
+            "/usr",
+            "/var",
+            "/media/scratch",
+            "/media/storage",
+            "/media/archive"
+        ],
+        "excludeDir": [
+            "/dev",
+            "/proc",
+            "/sys",
+            "/run",
+            "/var/run",
+            "/tmp",
+            "/lost+found",
+            "/media/archive",
+            "/media/storage",
+            "/usr/bin/X11",
+            "/usr/lib/chromium-browser/libs",
+            "/var/cache",
+            "/var/core",
+            "/var/swap"
+        ]
+}
